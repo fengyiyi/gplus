@@ -3,7 +3,7 @@
 这是我做的第一个wordpress皮肤，肯定有很多问题，希望大家能够体谅和积极反馈，我会及时修改的。
 
 ## 预览图
-![screenshot.png](http://www.welefen.com/wp-content/themes/plus/screenshot.png "google plus for wordpress theme")
+![screenshot.png](http://www.welefen.com/wp-content/themes/gplus/screenshot.png "google plus for wordpress theme")
 ## 功能列表
 1、完全基于html5+css3的实现，使用了header, footer, section, article, nav, aside等html5标签，使用圆角，阴影、动画等css3技术
 

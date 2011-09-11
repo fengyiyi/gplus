@@ -1,11 +1,4 @@
-<?php 
-add_theme_support( 'automatic-feed-links' );
-add_theme_support( 'post-thumbnails' );
-
-if ( ! isset( $content_width ) ) $content_width = 900;
-
-
-
+<?php
 function gplus_widgets_init() {
 	register_sidebar(array(
 		'name' => __('Primary Widget Area', 'gplus'),
@@ -66,6 +59,24 @@ $gplus_items = array (
 		'type' => 'text'
 	),
 	array(
+		'id' => 'header_not_fixed',
+		'name' => __('header not fixed', 'gplus'),
+		'desc' => __('header not fixed?', 'gplus'),
+		'type' => 'checkbox'
+	),
+	array(
+		'id' => 'show_author',
+		'name' => __('show author', 'gplus'),
+		'desc' => __('display author in article list?', 'gplus'),
+		'type' => 'checkbox'
+	),
+	array(
+		'id' => 'not_use_ajax',
+		'name' => __('not use ajax', 'gplus'),
+		'desc' => __('if not use ajax, cache,storage and animate options is not used', 'gplus'),
+		'type' => 'checkbox'
+	),
+	array(
 		'id' => 'cache_time',
 		'name' => __('cache time', 'gplus'),
 		'desc' => __('cache time. default is 1 day. 24 *3600 seconds. 0 is not cache', 'gplus'),
@@ -84,23 +95,17 @@ $gplus_items = array (
 		'type' => 'radio'
 	),
 	array(
-		'id' => 'header_not_fixed',
-		'name' => __('header not fixed', 'gplus'),
-		'desc' => __('header not fixed?', 'gplus'),
-		'type' => 'checkbox'
-	),
-	array(
-		'id' => 'show_author',
-		'name' => __('show author', 'gplus'),
-		'desc' => __('display author in article list?', 'gplus'),
-		'type' => 'checkbox'
+		'id' => 'use_manifest',
+		'name' => __('use manifest', 'gplus'),
+		'desc' => __('use manifest', 'gplus'),
+		'type' => 'checkbox',
 	),
 	array(
 		'id' => 'manifest_value',
 		'name' => __('manifest value', 'gplus'),
 		'desc' => __('just in chrome & firefox', 'gplus'),
 		'type' => 'textarea',
-		'default_value' => "CACHE MANIFEST\n\n# VERSION 0.4\n\nCACHE:\nwp-content/themes/gplus/js/jquery.js\n\nNETWORK:\nwp-admin/\n"
+		'default_value' => "CACHE MANIFEST\n\nCACHE:\nwp-content/themes/gplus/js/jquery.js\n\nNETWORK:\nwp-admin/\n"
 	),
 );
 add_action( 'admin_init', 'gplus_theme_options_init' );
@@ -201,3 +206,63 @@ function gplus_is_ie(){
 function gplus_is_ie6(){
 	return !!(strpos($_SERVER["HTTP_USER_AGENT"], "MSIE 6") !== false);
 }
+/**
+ * 
+ * 获取最新文章的最后修改时间
+ */
+function gplus_max_post_time(){
+	global $wpdb,$table_prefix;
+	$sql = "select post_modified as time from ".$table_prefix."posts where post_status='publish' ORDER BY ID DESC LIMIT 1 ";
+	$result = $wpdb->get_results($sql);
+	if (is_array($result)){
+		$time = $result[0]->time;
+		return strtotime($time);
+	}
+	return null;
+}
+/**
+ * 
+ * 获取关键字和描述
+ */
+function gplus_get_keywords_description(){
+	global $post;
+	if (is_home()){
+		$keywords = get_bloginfo('name');
+		$description = get_bloginfo('description');
+	}elseif (is_single()){
+		if ($post->post_excerpt) {
+	        $description = $post->post_excerpt;
+	    } else {
+	    	if (WPLANG === 'zh_CN'){
+	    		$len = 100;
+	    	}else{
+	    		$len = 200;
+	    	}
+	        $description = mb_substr(strip_tags($post->post_content), 0, $len);
+	    }
+	    $cate = get_the_category();
+		$keywords = array();
+		foreach ($cate as $item){
+			$keywords[] = $item->name;
+		}     
+	    $tags = wp_get_post_tags($post->ID);
+	    foreach ($tags as $tag ) {
+	        $keywords[] = $tag->name;
+	    }
+	    $keywords = array_unique($keywords);
+	    $keywords = join(', ', $keywords);
+	}
+	return array($keywords, $description);
+}
+/**
+ * 
+ * 获取配置项
+ */
+function gplus_get_options(){
+	static $options = array();
+	if (count($options) === 0){
+		$options = get_option('gplus_options');
+	}
+	return $options;
+}
+?>

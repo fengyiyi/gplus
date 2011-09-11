@@ -3,7 +3,7 @@
 <?php };?>
 
 
-	<?php $options = get_option('gplus_options');the_post(); ?>
+	<?php $options = gplus_get_options();the_post(); ?>
 	<div class="cate">
 		<?php if ( is_day() ) : ?>
 			<h2><?php printf((__('Daily Archives:', 'gplus').' <span>%s</span>'),get_the_time(get_option('date_format'))) ?></h2>
@@ -22,7 +22,7 @@
 	<?php rewind_posts(); ?>
 	
 	<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-	<article id="post-<?php the_ID(); ?>" <?php post_class("item clearfix"); ?>>
+	<article class="item clearfix">
 		<h2 class="title">
 			<a href="<?php the_permalink() ?>"><?php the_title() ?></a>
 		</h2>
@@ -40,13 +40,13 @@
 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>
 		<?php } ?>
 		</summary>
-		<div class="date">
+		<div class="date" title="<?php the_time('Y-m-d H:i:s')?>">
 			<div class="md"><?php the_time('m-d'); ?></div>
 			<div class="y"><?php the_time('Y'); ?></div>
 		</div>
 	</article>
 	<?php endwhile; ?>
-	<div class="line"></div>
+	<div class="highline"></div>
 	<?php  else: ?>
 	<div class="post post-single">
 		<h2 class="title title-single"><a href="#" title="<?php _e('Error 404 - Not Found', 'gplus'); ?>"><?php _e('Error 404 - Not Found', 'gplus'); ?></a></h2>

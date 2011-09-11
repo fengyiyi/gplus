@@ -1,6 +1,6 @@
-<?php $options = get_option('gplus_options');?>
+<?php $options = gplus_get_options();?>
 <!DOCTYPE html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> <?php if ($options['use_manifest']):?>manifest="<?php echo home_url();?>?manifest=welefen"<?php endif;?>>
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>" />
 	<meta name="viewport" content="width=980" />
@@ -9,7 +9,11 @@
 <?php else : ?>
 	<title><?php bloginfo('name'); ?><?php if ( $paged > 1 ) echo ( ' - page '.$paged ); ?></title>
 <?php endif; ?>
-
+	<?php $kd = gplus_get_keywords_description();?>
+	<?php if (is_array($kd) && $kd[0]):?>
+	<meta name="keywords" content="<?php echo $kd[0];?>" />
+	<meta name="description" content="<?php echo $kd[1];?>" />
+	<?php endif;?>
 	<?php if ( is_singular() && get_option( 'thread_comments' ) ) wp_enqueue_script( 'comment-reply' ); ?>
 	<link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
@@ -21,12 +25,12 @@
 	<?php wp_head(); ?>
 </head>
 <?php flush(); ?>
-<body <?php if(is_admin_bar_showing()) $class="show-admin-bar";body_class( $class ); ?>>
+<body <?php if(is_admin_bar_showing()) : ?> class="show-admin-bar";<?endif;?> >
 <header <?php if ($options['header_not_fixed'] || gplus_is_ie6()) :?>class="notfixed"<?php endif;?>>
 	<div class="g98 clearfix">
 		<h1 class="logo l"><a href="<?php echo home_url(); ?>" title="<?php bloginfo('name'); ?> - <?php bloginfo('description');?>">
 		<?php if ( $options['logo_url'] ) : ?>
-			<img title="<?php bloginfo('name'); ?>" src="<?php echo $options['logo_url']  ;?>"  alt="" />
+			<img title="<?php bloginfo('name'); ?>" src="<?php echo $options['logo_url']  ;?>"  alt="<?php bloginfo('name'); ?>" />
 		<?php else:?>
 		<?php bloginfo('name'); ?>
 		<?php endif; ?>	

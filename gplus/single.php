@@ -3,8 +3,8 @@
 <?php };?>
 
 
-	<?php the_post();$options = get_option('gplus_options'); ?>
-	<article id="post-<?php the_ID(); ?>" <?php post_class("detail"); ?>>
+	<?php the_post();$options = gplus_get_options(); ?>
+	<article class="detail">
 		<h2 class="title"><?php the_title() ?></h2>
 		<p class="desc">
 		<?php if ($options['show_author']):?>
@@ -20,7 +20,7 @@
 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>
 		<?php } ?>
 		</div>
-		<div class="date">
+		<div class="date" title="<?php the_time("Y-m-d H:i:s")?>">
 			<div class="md"><?php the_time('m-d'); ?></div>
 			<div class="y"><?php the_time('Y'); ?></div>
 		</div>

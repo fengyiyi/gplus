@@ -2,7 +2,7 @@
 Theme Name:gplus
 Theme URI:http://www.welefen.com/?p=677
 Description: like google plus ui theme, support change location url without refresh(pushstate+ajax=pjax), support keybord event(J\K), support localstorage & manifest to cache static files. style.css and other static files is compressed to reduce file size.
-Version:1.0.2
+Version:1.0.3
 Author:welefen
 Author URI:http://www.welefen.com/
 Tags:custom-menu, threaded-comments, two-columns, fixed-width, right-sidebar, theme-options
@@ -201,7 +201,7 @@ article.detail img{
 #content{float:left;width:700px;padding:0;position:relative;overflow:hidden;
 }
 
-#content .line{
+#content .highline{
 	position:absolute;
 	top:0;
 	left:0;
@@ -363,14 +363,6 @@ h3.related_post_title{
 #submit{
 	padding:5px 10px;
 }
-.wp-caption{}
-.wp-caption-text{}
-.sticky{}
-.gallery-caption{}
-.bypostauthor{}
-.alignright{}
-.alignleft{}
-.aligncenter{}
 .navigation{
 	line-height:32px;
 }
@@ -381,3 +373,8 @@ h3.related_post_title{
 article div.detail pre{
 	word-break:break-all;word-wrap:break-word;white-space:pre-wrap
 }
+summary p, .detail p{
+	margin-bottom:10px;
+}
+.wpcaption{text-align:center;}
+.aligncenter{margin:auto}

@@ -1,19 +1,20 @@
-<?php $options = get_option('gplus_options');if ($_GET['manifest'] === 'welefen') :?>
-<html manifest="<?php echo home_url();?>?manifest=content">
-<head></head>
-<body>manifest proxy page</body>
-</html>
-<?php elseif ($_GET['manifest'] === 'content'):?>
-<?php 
+<?php $options = gplus_get_options();if ($_GET['manifest'] === 'welefen') :?>
+<?php
 header('Content-Type: text/cache-manifest');
-echo trim($options['manifest_value']);
+$content = trim($options['manifest_value']);
+$time = gplus_max_post_time();
+if ($time){
+	$content = preg_replace("/\#\s*VERSION(?:.*?)\\n/ies", "", $content);
+	$content = str_replace("CACHE MANIFEST", "CACHE MANIFEST\n# VERSION 1." . $time, $content);
+}
+echo $content;
 ?>
 <?php else :?>
 <?php if (!gplus_is_pjax()) { get_header(); ?>
 <div id="content">
 <?php };?>
 	<?php if (have_posts()) : while (have_posts()) : the_post();?>
-	<article id="post-<?php the_ID(); ?>" <?php post_class("item clearfix"); ?>>
+	<article class="item clearfix">
 		<h2 class="title">
 			<a href="<?php the_permalink() ?>"><?php the_title() ?></a>
 		</h2>
@@ -31,13 +32,13 @@ echo trim($options['manifest_value']);
 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>
 		<?php } ?>
 		</summary>
-		<div class="date">
+		<div class="date" title="<?php the_time("Y-m-d H:i:s")?>">
 			<div class="md"><?php the_time('m-d'); ?></div>
 			<div class="y"><?php the_time('Y'); ?></div>
 		</div>
 	</article>
 	<?php endwhile; ?>
-	<div class="line"></div>
+	<div class="highline"></div>
 	<?php else: ?>
 	<?php $old = $_SERVER['HTTP_X_PJAX'];$_SERVER['HTTP_X_PJAX'] = 'true';include_once '404.php'; $_SERVER['HTTP_X_PJAX'] = $old;?>
 	<?php endif; ?>

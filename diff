@@ -1,0 +1,677 @@
+diff --git a/gplus/404.php b/gplus/404.php
+index c229862..eb91360 100755
+--- a/gplus/404.php
++++ b/gplus/404.php
+@@ -1,4 +1,4 @@
+-<?php if (!gplus_is_pjax()) { get_header(); $options = get_option('gplus_options');?><div id="content">
++<?php if (!gplus_is_pjax()) { get_header(); $options = gplus_get_options();?><div id="content">
+ <?php };?>
+ 
+ 	<?php if ($options['404img_url']):?>
+diff --git a/gplus/archive.php b/gplus/archive.php
+index c914758..cf454de 100755
+--- a/gplus/archive.php
++++ b/gplus/archive.php
+@@ -3,7 +3,7 @@
+ <?php };?>
+ 
+ 
+-	<?php $options = get_option('gplus_options');the_post(); ?>
++	<?php $options = gplus_get_options();the_post(); ?>
+ 	<div class="cate">
+ 		<?php if ( is_day() ) : ?>
+ 			<h2><?php printf((__('Daily Archives:', 'gplus').' <span>%s</span>'),get_the_time(get_option('date_format'))) ?></h2>
+@@ -22,7 +22,7 @@
+ 	<?php rewind_posts(); ?>
+ 	
+ 	<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+-	<article id="post-<?php the_ID(); ?>" <?php post_class("item clearfix"); ?>>
++	<article class="item clearfix">
+ 		<h2 class="title">
+ 			<a href="<?php the_permalink() ?>"><?php the_title() ?></a>
+ 		</h2>
+@@ -40,13 +40,13 @@
+ 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>
+ 		<?php } ?>
+ 		</summary>
+-		<div class="date">
++		<div class="date" title="<?php the_time('Y-m-d H:i:s')?>">
+ 			<div class="md"><?php the_time('m-d'); ?></div>
+ 			<div class="y"><?php the_time('Y'); ?></div>
+ 		</div>
+ 	</article>
+ 	<?php endwhile; ?>
+-	<div class="line"></div>
++	<div class="highline"></div>
+ 	<?php  else: ?>
+ 	<div class="post post-single">
+ 		<h2 class="title title-single"><a href="#" title="<?php _e('Error 404 - Not Found', 'gplus'); ?>"><?php _e('Error 404 - Not Found', 'gplus'); ?></a></h2>
+diff --git a/gplus/footer.php b/gplus/footer.php
+index ef42d52..1a1f005 100755
+--- a/gplus/footer.php
++++ b/gplus/footer.php
+@@ -1,18 +1,17 @@
+ </div>
+ <?php flush(); ?>
+ <footer>
+-	&copy; <?php echo date("Y"); ?>&nbsp;<?php bloginfo('name'); ?> - <a href="http://wordpress.org/">WordPress</a> - <a href="http://www.welefen.com/google-plus-for-wordpress-theme.html" title="plus theme designed by welefen">gplus</a>
++	&copy; <?php echo date("Y"); ?>&nbsp;<?php bloginfo('name'); ?> - <a href="http://wordpress.org/">WordPress</a> - <a href="http://www.welefen.com/google-plus-for-wordpress-theme.html" title="gplus theme designed by welefen">gplus</a>
+ </footer>
+ <?php wp_footer();?>
+-<?php if (!gplus_is_ie()):?>
+-<?php $options = get_option('gplus_options');?>
++<?php $options = gplus_get_options();?>
++<?php if (!gplus_is_ie() && !($options['not_use_ajax'])):?>
+ <div class="loading"><span>loading...</span></div>
+ <script>var pjaxHomeUrl = "<?php echo home_url();?>", pjaxTitleSuffix="<?php bloginfo('name'); ?>", pjaxUseStorage=<?php if ($options['not_use_storage']):?>false<?php else :?>true<?php endif;?>, pjaxCacheTime=<?php if (strlen($options['cache_time'])):echo intval($options['cache_time'])?><?php else :?>true<?php endif;?>, pjaxFx="<?php echo $options['show_fx']?>";</script>
+ <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.js"></script>
+ <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/plus.js"></script>
+-<?php if (trim($options['manifest_value'])):?>
+-<iframe src="<?php echo home_url(); ?>?manifest=welefen" style="display:none;"></iframe>
+-<?php endif;?>
++<!--<script type="text/javascript" src="http://img.baidu.com/js/tangram-base-1.3.9.js"></script>
++<script src="http://www/pjax/tangram.pjax.js"></script>-->
+ <?php endif;?>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/gplus/functions.php b/gplus/functions.php
+index fb2f4ed..52c35eb 100755
+--- a/gplus/functions.php
++++ b/gplus/functions.php
+@@ -1,11 +1,4 @@
+-<?php 
+-add_theme_support( 'automatic-feed-links' );
+-add_theme_support( 'post-thumbnails' );
+-
+-if ( ! isset( $content_width ) ) $content_width = 900;
+-
+-
+-
++<?php
+ function gplus_widgets_init() {
+ 	register_sidebar(array(
+ 		'name' => __('Primary Widget Area', 'gplus'),
+@@ -66,6 +59,24 @@ $gplus_items = array (
+ 		'type' => 'text'
+ 	),
+ 	array(
++		'id' => 'header_not_fixed',
++		'name' => __('header not fixed', 'gplus'),
++		'desc' => __('header not fixed?', 'gplus'),
++		'type' => 'checkbox'
++	),
++	array(
++		'id' => 'show_author',
++		'name' => __('show author', 'gplus'),
++		'desc' => __('display author in article list?', 'gplus'),
++		'type' => 'checkbox'
++	),
++	array(
++		'id' => 'not_use_ajax',
++		'name' => __('not use ajax', 'gplus'),
++		'desc' => __('if not use ajax, cache,storage and animate options is not used', 'gplus'),
++		'type' => 'checkbox'
++	),
++	array(
+ 		'id' => 'cache_time',
+ 		'name' => __('cache time', 'gplus'),
+ 		'desc' => __('cache time. default is 1 day. 24 *3600 seconds. 0 is not cache', 'gplus'),
+@@ -84,23 +95,17 @@ $gplus_items = array (
+ 		'type' => 'radio'
+ 	),
+ 	array(
+-		'id' => 'header_not_fixed',
+-		'name' => __('header not fixed', 'gplus'),
+-		'desc' => __('header not fixed?', 'gplus'),
+-		'type' => 'checkbox'
+-	),
+-	array(
+-		'id' => 'show_author',
+-		'name' => __('show author', 'gplus'),
+-		'desc' => __('display author in article list?', 'gplus'),
+-		'type' => 'checkbox'
++		'id' => 'use_manifest',
++		'name' => __('use manifest', 'gplus'),
++		'desc' => __('use manifest', 'gplus'),
++		'type' => 'checkbox',
+ 	),
+ 	array(
+ 		'id' => 'manifest_value',
+ 		'name' => __('manifest value', 'gplus'),
+ 		'desc' => __('just in chrome & firefox', 'gplus'),
+ 		'type' => 'textarea',
+-		'default_value' => "CACHE MANIFEST\n\n# VERSION 0.4\n\nCACHE:\nwp-content/themes/gplus/js/jquery.js\n\nNETWORK:\nwp-admin/\n"
++		'default_value' => "CACHE MANIFEST\n\nCACHE:\nwp-content/themes/gplus/js/jquery.js\n\nNETWORK:\nwp-admin/\n"
+ 	),
+ );
+ add_action( 'admin_init', 'gplus_theme_options_init' );
+@@ -200,4 +205,64 @@ function gplus_is_ie(){
+ }
+ function gplus_is_ie6(){
+ 	return !!(strpos($_SERVER["HTTP_USER_AGENT"], "MSIE 6") !== false);
+-}
+\ No newline at end of file
++}
++/**
++ * 
++ * 获取最新文章的最后修改时间
++ */
++function gplus_max_post_time(){
++	global $wpdb,$table_prefix;
++	$sql = "select post_modified as time from ".$table_prefix."posts where post_status='publish' ORDER BY ID DESC LIMIT 1 ";
++	$result = $wpdb->get_results($sql);
++	if (is_array($result)){
++		$time = $result[0]->time;
++		return strtotime($time);
++	}
++	return null;
++}
++/**
++ * 
++ * 获取关键字和描述
++ */
++function gplus_get_keywords_description(){
++	global $post;
++	if (is_home()){
++		$keywords = get_bloginfo('name');
++		$description = get_bloginfo('description');
++	}elseif (is_single()){
++		if ($post->post_excerpt) {
++	        $description = $post->post_excerpt;
++	    } else {
++	    	if (WPLANG === 'zh_CN'){
++	    		$len = 100;
++	    	}else{
++	    		$len = 200;
++	    	}
++	        $description = mb_substr(strip_tags($post->post_content), 0, $len);
++	    }
++	    $cate = get_the_category();
++		$keywords = array();
++		foreach ($cate as $item){
++			$keywords[] = $item->name;
++		}     
++	    $tags = wp_get_post_tags($post->ID);
++	    foreach ($tags as $tag ) {
++	        $keywords[] = $tag->name;
++	    }
++	    $keywords = array_unique($keywords);
++	    $keywords = join(', ', $keywords);
++	}
++	return array($keywords, $description);
++}
++/**
++ * 
++ * 获取配置项
++ */
++function gplus_get_options(){
++	static $options = array();
++	if (count($options) === 0){
++		$options = get_option('gplus_options');
++	}
++	return $options;
++}
++?>
+\ No newline at end of file
+diff --git a/gplus/header.php b/gplus/header.php
+index 657c542..1582957 100755
+--- a/gplus/header.php
++++ b/gplus/header.php
+@@ -1,6 +1,6 @@
+-<?php $options = get_option('gplus_options');?>
++<?php $options = gplus_get_options();?>
+ <!DOCTYPE html>
+-<html <?php language_attributes(); ?>>
++<html <?php language_attributes(); ?> <?php if ($options['use_manifest']):?>manifest="<?php echo home_url();?>?manifest=welefen"<?php endif;?>>
+ <head>
+ 	<meta charset="<?php bloginfo('charset'); ?>" />
+ 	<meta name="viewport" content="width=980" />
+@@ -9,7 +9,11 @@
+ <?php else : ?>
+ 	<title><?php bloginfo('name'); ?><?php if ( $paged > 1 ) echo ( ' - page '.$paged ); ?></title>
+ <?php endif; ?>
+-
++	<?php $kd = gplus_get_keywords_description();?>
++	<?php if (is_array($kd) && $kd[0]):?>
++	<meta name="keywords" content="<?php echo $kd[0];?>" />
++	<meta name="description" content="<?php echo $kd[1];?>" />
++	<?php endif;?>
+ 	<?php if ( is_singular() && get_option( 'thread_comments' ) ) wp_enqueue_script( 'comment-reply' ); ?>
+ 	<link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
+ 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
+@@ -21,12 +25,12 @@
+ 	<?php wp_head(); ?>
+ </head>
+ <?php flush(); ?>
+-<body <?php if(is_admin_bar_showing()) $class="show-admin-bar";body_class( $class ); ?>>
++<body <?php if(is_admin_bar_showing()) : ?> class="show-admin-bar";<?endif;?> >
+ <header <?php if ($options['header_not_fixed'] || gplus_is_ie6()) :?>class="notfixed"<?php endif;?>>
+ 	<div class="g98 clearfix">
+ 		<h1 class="logo l"><a href="<?php echo home_url(); ?>" title="<?php bloginfo('name'); ?> - <?php bloginfo('description');?>">
+ 		<?php if ( $options['logo_url'] ) : ?>
+-			<img title="<?php bloginfo('name'); ?>" src="<?php echo $options['logo_url']  ;?>"  alt="" />
++			<img title="<?php bloginfo('name'); ?>" src="<?php echo $options['logo_url']  ;?>"  alt="<?php bloginfo('name'); ?>" />
+ 		<?php else:?>
+ 		<?php bloginfo('name'); ?>
+ 		<?php endif; ?>	
+diff --git a/gplus/index.php b/gplus/index.php
+index 9f7d10d..14c0209 100755
+--- a/gplus/index.php
++++ b/gplus/index.php
+@@ -1,19 +1,20 @@
+-<?php $options = get_option('gplus_options');if ($_GET['manifest'] === 'welefen') :?>
+-<html manifest="<?php echo home_url();?>?manifest=content">
+-<head></head>
+-<body>manifest proxy page</body>
+-</html>
+-<?php elseif ($_GET['manifest'] === 'content'):?>
+-<?php 
++<?php $options = gplus_get_options();if ($_GET['manifest'] === 'welefen') :?>
++<?php
+ header('Content-Type: text/cache-manifest');
+-echo trim($options['manifest_value']);
++$content = trim($options['manifest_value']);
++$time = gplus_max_post_time();
++if ($time){
++	$content = preg_replace("/\#\s*VERSION(?:.*?)\\n/ies", "", $content);
++	$content = str_replace("CACHE MANIFEST", "CACHE MANIFEST\n# VERSION 1." . $time, $content);
++}
++echo $content;
+ ?>
+ <?php else :?>
+ <?php if (!gplus_is_pjax()) { get_header(); ?>
+ <div id="content">
+ <?php };?>
+ 	<?php if (have_posts()) : while (have_posts()) : the_post();?>
+-	<article id="post-<?php the_ID(); ?>" <?php post_class("item clearfix"); ?>>
++	<article class="item clearfix">
+ 		<h2 class="title">
+ 			<a href="<?php the_permalink() ?>"><?php the_title() ?></a>
+ 		</h2>
+@@ -31,13 +32,13 @@ echo trim($options['manifest_value']);
+ 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>
+ 		<?php } ?>
+ 		</summary>
+-		<div class="date">
++		<div class="date" title="<?php the_time("Y-m-d H:i:s")?>">
+ 			<div class="md"><?php the_time('m-d'); ?></div>
+ 			<div class="y"><?php the_time('Y'); ?></div>
+ 		</div>
+ 	</article>
+ 	<?php endwhile; ?>
+-	<div class="line"></div>
++	<div class="highline"></div>
+ 	<?php else: ?>
+ 	<?php $old = $_SERVER['HTTP_X_PJAX'];$_SERVER['HTTP_X_PJAX'] = 'true';include_once '404.php'; $_SERVER['HTTP_X_PJAX'] = $old;?>
+ 	<?php endif; ?>
+diff --git a/gplus/js/plus.js b/gplus/js/plus.js
+index 488835c..9ec52c6 100755
+--- a/gplus/js/plus.js
++++ b/gplus/js/plus.js
+@@ -21,7 +21,9 @@
+ 	}
+ 	//获取不带hash的url
+ 	function getRealUrl(src){
+-		return (src || '').replace(/\#.*?$/, '');
++		src = (src || '').replace(/\#.*?$/, '');
++		src = src.replace('?pjax=true', '').replace('&pjax=true', '');
++		return src;
+ 	}
+ 	//获取本地储存的key
+ 	function getLocalKey(src){
+@@ -45,6 +47,7 @@
+ 	//获取缓存
+ 	function getCache(src, time, flag){
+ 		var item, vkey, tkey, tval;
++		time = time | 0;
+ 		if(src in pjaxStack){
+ 			item = pjaxStack[src], ctime = getTime();
+ 			if((item.time + time*1000) > ctime){
+@@ -58,7 +61,7 @@
+ 			tkey = l.time;
+ 			item = window.localStorage.getItem(vkey);
+ 			if(item){
+-				tval = window.localStorage.getItem(tkey);
++				tval = window.localStorage.getItem(tkey) | 0;
+ 				if((tval + time*1000) > getTime()){
+ 					return {data: item, title: localStorage.getItem(l.title)};
+ 				}else{
+@@ -149,9 +152,7 @@
+ 		if(options){
+ 			options.container = container;
+ 		}else{
+-			options = {
+-				container: container
+-			};
++			options = $.isPlainObject(container) ? container : {container:container};
+ 		}
+ 		var obj, container = $(options.container);
+ 		delete options.callback;
+@@ -194,7 +195,9 @@
+ 			title: '', 		//标题
+ 			titleSuffix: '', //标题后缀
+ 			type: 'GET',
+-			data: {},
++			data: {
++				pjax: true
++			},
+ 			dataType: 'html',
+ 			callback: null, //回调函数 
+ 			beforeSend: function(xhr){
+@@ -245,8 +248,10 @@
+ 				}else if(options.push === false){
+ 					 window.history.replaceState(state, document.title, options.url);
+ 				}
+-				if(options.push !== null && window._gaq){
+-					_gaq.push(['_trackPageview']);
++				if(options.push !== null){
++					if(window._gaq){
++						_gaq.push(['_trackPageview']);
++					}
+ 				}
+ 				options.callback && options.callback(dom, function(){
+ 					container.trigger('end.pjax');
+@@ -301,6 +306,7 @@
+ 		  if ( state && state.container ) {
+ 		    container = state.container;
+ 		    if ( $(container).length ){
++		    	
+ 		    	 $.pjax({
+ 				        url: state.url || location.href,
+ 				        container: container,
+@@ -349,7 +355,7 @@ $(function(){
+ 		});
+ 	}
+ 	function showLine(){
+-		var article = $('article.item'), len = article.length, line = $('.line'), current = 0, art, next, filterList;
++		var article = $('article.item'), len = article.length, line = $('.highline'), current = 0, art, next, filterList;
+ 		if(!len) return true;
+ 		art = $(article[0]);
+ 		line.css({
+@@ -370,7 +376,7 @@ $(function(){
+ 				var keyCode = (event.keyCode || event.which) + '';
+ 				if(len && keyCode in filterList && filterList[keyCode]()){
+ 					next = $($('article.item')[current]);
+-					animate($('.line'), next);
++					animate($('.highline'), next);
+ 				}
+ 			});
+ 			$(document.body).delegate('article.item', 'click', function(){
+diff --git a/gplus/lang/zh_CN.mo b/gplus/lang/zh_CN.mo
+index 4a7e8aa..d556d88 100755
+Binary files a/gplus/lang/zh_CN.mo and b/gplus/lang/zh_CN.mo differ
+diff --git a/gplus/lang/zh_CN.po b/gplus/lang/zh_CN.po
+index e667eb8..e84f5b4 100644
+--- a/gplus/lang/zh_CN.po
++++ b/gplus/lang/zh_CN.po
+@@ -2,8 +2,8 @@ msgid ""
+ msgstr ""
+ "Project-Id-Version: default\n"
+ "Report-Msgid-Bugs-To: \n"
+-"POT-Creation-Date: 2011-07-25 09:37+0800\n"
+-"PO-Revision-Date: 2011-07-25 09:37+0800\n"
++"POT-Creation-Date: 2011-08-08 15:56+0800\n"
++"PO-Revision-Date: 2011-08-08 15:56+0800\n"
+ "Last-Translator: welefen <welefen@gmail.com>\n"
+ "Language-Team: zwwooooo <http://zww.me/>\n"
+ "MIME-Version: 1.0\n"
+@@ -99,68 +99,81 @@ msgid "404 page image URL. max width is 700px"
+ msgstr "404图片地址，最大宽度为700px"
+ 
+ #: functions.php:70
+-msgid "cache time"
+-msgstr "缓存时间"
++msgid "header not fixed"
++msgstr "不固定顶部？"
+ 
+ #: functions.php:71
+-msgid "cache time. default is 1 day. 24 *3600 seconds. 0 is not cache"
+-msgstr "缓存时间，默认为1天。单位为秒，0为不缓存"
++msgid "header not fixed?"
++msgstr "顶部(header)不固定？IE6由于不支持固定模式，所以都是不固定的"
+ 
+ #: functions.php:76
+-msgid "not use storage?"
+-msgstr "不使用本地存储？"
++msgid "show author"
++msgstr "显示文章作者"
+ 
+ #: functions.php:77
+-msgid "use storage for cache content for next request"
+-msgstr "使用本地存储可以在下次访问的时候直接使用缓存"
++msgid "display author in article list?"
++msgstr "文章列表页和详细页是否显示当前文章的作者？"
+ 
+ #: functions.php:82
+-msgid "show fx?"
+-msgstr "展现动画"
++msgid "not use ajax"
++msgstr "不使用ajax？"
+ 
+ #: functions.php:83
+-msgid "animate for show content "
+-msgstr "内容展现动画"
++msgid "if not use ajax, cache,storage and animate options is not used"
++msgstr "如果不使用ajax，下面的缓存、本地存储和动画选项将无效"
+ 
+ #: functions.php:88
+-msgid "header not fixed"
+-msgstr "顶部不固定"
++msgid "cache time"
++msgstr "缓存时间"
+ 
+ #: functions.php:89
+-msgid "header not fixed?"
+-msgstr "头部不固定？"
++msgid "cache time. default is 1 day. 24 *3600 seconds. 0 is not cache"
++msgstr "缓存时间，默认为1天。单位为秒，0为不缓存"
+ 
+ #: functions.php:94
+-msgid "show author"
+-msgstr "显示文章作者"
++msgid "not use storage?"
++msgstr "不使用本地存储？"
+ 
+ #: functions.php:95
+-msgid "display author in article list?"
+-msgstr "文章里是否显示当前文章的作者"
++msgid "use storage for cache content for next request"
++msgstr "使用本地存储可以在下次访问的时候直接使用缓存"
+ 
+ #: functions.php:100
++msgid "show fx?"
++msgstr "展现动画"
++
++#: functions.php:101
++msgid "animate for show content "
++msgstr "内容展现动画"
++
++#: functions.php:106
++#: functions.php:107
++msgid "use manifest"
++msgstr "使用manifest加速"
++
++#: functions.php:112
+ msgid "manifest value"
+ msgstr "manifest内容"
+ 
+-#: functions.php:101
++#: functions.php:113
+ msgid "just in chrome & firefox"
+ msgstr ""
+ 
+-#: functions.php:123
+-#: functions.php:124
++#: functions.php:135
++#: functions.php:136
+ msgid "Theme Options"
+ msgstr "主题设置"
+ 
+-#: functions.php:139
++#: functions.php:151
+ #, php-format
+ msgid "%1$s Theme Options"
+ msgstr "%1$s 主题设置"
+ 
+-#: functions.php:141
++#: functions.php:153
+ msgid "Options saved"
+ msgstr "设置已保存"
+ 
+-#: functions.php:169
++#: functions.php:181
+ msgid "Save Options"
+ msgstr "保存设置"
+ 
+@@ -202,7 +215,7 @@ msgstr "分类: %s"
+ 
+ #: archive.php:34
+ #: single.php:14
+-#: index.php:25
++#: index.php:26
+ msgid "Tags:"
+ msgstr "标签: "
+ 
+@@ -213,19 +226,19 @@ msgstr "评论: "
+ 
+ #: archive.php:38
+ #: single.php:18
+-#: index.php:29
++#: index.php:30
+ msgid "Read more &raquo;"
+ msgstr "继续阅读 &raquo; "
+ 
+ #: archive.php:40
+ #: single.php:20
+-#: index.php:31
++#: index.php:32
+ msgid "This is a sticky post!"
+ msgstr "置顶文章！"
+ 
+ #: archive.php:40
+ #: single.php:20
+-#: index.php:31
++#: index.php:32
+ msgid "continue reading?"
+ msgstr "继续阅读？"
+ 
+@@ -251,12 +264,12 @@ msgid "Tag Cloud"
+ msgstr "标签云"
+ 
+ #: archive.php:81
+-#: index.php:55
++#: index.php:56
+ msgid "&laquo; Previous page"
+ msgstr "&laquo; 上一页"
+ 
+ #: archive.php:81
+-#: index.php:55
++#: index.php:56
+ msgid "Next page &raquo;"
+ msgstr "下一页 &raquo;"
+ 
+@@ -288,17 +301,17 @@ msgstr "管理"
+ msgid "Search: type"
+ msgstr "请输入关键字搜索"
+ 
+-#: index.php:22
++#: index.php:23
+ #, php-format
+ msgid "Author: %s"
+ msgstr "作者: %s"
+ 
+-#: index.php:24
++#: index.php:25
+ #, php-format
+ msgid "IN: %s"
+ msgstr "分类: %s"
+ 
+-#: index.php:26
++#: index.php:27
+ msgid "Comments: "
+ msgstr "评论: "
+ 
+diff --git a/gplus/page.php b/gplus/page.php
+index a7e3685..9c5dbc3 100755
+--- a/gplus/page.php
++++ b/gplus/page.php
+@@ -1,4 +1,4 @@
+-<?php if (!gplus_is_pjax()) { get_header();$options = get_option('gplus_options'); ?>
++<?php if (!gplus_is_pjax()) { get_header();$options = gplus_get_options(); ?>
+ <div id="content">
+ <?php };?>
+ 
+diff --git a/gplus/single.php b/gplus/single.php
+index a5ef5a2..093a555 100755
+--- a/gplus/single.php
++++ b/gplus/single.php
+@@ -3,8 +3,8 @@
+ <?php };?>
+ 
+ 
+-	<?php the_post();$options = get_option('gplus_options'); ?>
+-	<article id="post-<?php the_ID(); ?>" <?php post_class("detail"); ?>>
++	<?php the_post();$options = gplus_get_options(); ?>
++	<article class="detail">
+ 		<h2 class="title"><?php the_title() ?></h2>
+ 		<p class="desc">
+ 		<?php if ($options['show_author']):?>
+@@ -20,7 +20,7 @@
+ 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>
+ 		<?php } ?>
+ 		</div>
+-		<div class="date">
++		<div class="date" title="<?php the_time("Y-m-d H:i:s")?>">
+ 			<div class="md"><?php the_time('m-d'); ?></div>
+ 			<div class="y"><?php the_time('Y'); ?></div>
+ 		</div>
+diff --git a/gplus/style.css b/gplus/style.css
+index cd83668..c9922e0 100755
+--- a/gplus/style.css
++++ b/gplus/style.css
+@@ -2,7 +2,7 @@
+ Theme Name:gplus
+ Theme URI:http://www.welefen.com/?p=677
+ Description: like google plus ui theme, support change location url without refresh(pushstate+ajax=pjax), support keybord event(J\K), support localstorage & manifest to cache static files. style.css and other static files is compressed to reduce file size.
+-Version:1.0.2
++Version:1.0.3
+ Author:welefen
+ Author URI:http://www.welefen.com/
+ Tags:custom-menu, threaded-comments, two-columns, fixed-width, right-sidebar, theme-options
+@@ -201,7 +201,7 @@ article.detail img{
+ #content{float:left;width:700px;padding:0;position:relative;overflow:hidden;
+ }
+ 
+-#content .line{
++#content .highline{
+ 	position:absolute;
+ 	top:0;
+ 	left:0;
+@@ -363,14 +363,6 @@ h3.related_post_title{
+ #submit{
+ 	padding:5px 10px;
+ }
+-.wp-caption{}
+-.wp-caption-text{}
+-.sticky{}
+-.gallery-caption{}
+-.bypostauthor{}
+-.alignright{}
+-.alignleft{}
+-.aligncenter{}
+ .navigation{
+ 	line-height:32px;
+ }
+@@ -380,4 +372,9 @@ h3.related_post_title{
+ .wordwrap{word-break:break-all;word-wrap:break-word}pre.wordwrap{white-space:pre-wrap}
+ article div.detail pre{
+ 	word-break:break-all;word-wrap:break-word;white-space:pre-wrap
+-}
+\ No newline at end of file
++}
++summary p, .detail p{
++	margin-bottom:10px;
++}
++.wpcaption{text-align:center;}
++.aligncenter{margin:auto}

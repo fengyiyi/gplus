@@ -1,4 +1,4 @@
-<?php if (!gplus_is_pjax()) { get_header();$options = get_option('gplus_options'); ?>
+<?php if (!gplus_is_pjax()) { get_header();$options = gplus_get_options(); ?>
 <div id="content">
 <?php };?>
 

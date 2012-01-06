@@ -26,7 +26,7 @@ echo $content;
 		<?php the_tags(__('Tags:', 'gplus') . ' ', ', ', ''); ?> &nbsp;&nbsp;&nbsp;
 		<?php _e('Comments: ', 'gplus') . comments_popup_link('0', '1', '%', '', 'comments closed'); ?>
 		</p>
-		<summary>
+		<summary class="clearfix">
 			<?php  the_content(__('Read more &raquo;', 'gplus'));  ?>
 		<?php if(is_sticky()) { ?>
 			<p><?php _e('This is a sticky post!', 'gplus'); ?> <a href="<?php the_permalink() ?>" class="more-links"><?php _e('continue reading?', 'gplus'); ?></a></p>

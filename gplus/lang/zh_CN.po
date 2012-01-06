@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: default\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-08 15:56+0800\n"
-"PO-Revision-Date: 2011-08-08 15:56+0800\n"
+"POT-Creation-Date: 2012-01-04 16:07+0800\n"
+"PO-Revision-Date: 2012-01-04 16:07+0800\n"
 "Last-Translator: welefen <welefen@gmail.com>\n"
 "Language-Team: zwwooooo <http://zww.me/>\n"
 "MIME-Version: 1.0\n"
@@ -57,123 +57,134 @@ msgstr "提交"
 msgid "Trackbacks and Pingbacks:"
 msgstr "Trackbacks and Pingbacks:"
 
-#: functions.php:11
+#: functions.php:4
 msgid "Primary Widget Area"
 msgstr "主小工具区域"
 
-#: functions.php:13
+#: functions.php:6
 msgid "The primary widget area"
 msgstr "全部页面显示的小工具区域"
 
-#: functions.php:27
+#: functions.php:20
 #, php-format
 msgid "%1$s at %2$s"
 msgstr "%1$s 在 %2$s"
 
-#: functions.php:27
+#: functions.php:20
 msgid "[Edit]"
 msgstr "[编辑]"
 
-#: functions.php:29
+#: functions.php:22
 msgid "Your comment is awaiting moderation."
 msgstr "您的评论正在等待审核。"
 
-#: functions.php:48
+#: functions.php:41
 msgid "Primary Navigation"
 msgstr "主要导航"
 
-#: functions.php:58
+#: functions.php:51
 msgid "logo image URL"
 msgstr "logo图片地址"
 
-#: functions.php:59
+#: functions.php:52
 msgid "logo image url.(with http://), height is 28px, max width is 140px"
 msgstr "logo图片地址，高度为28px，最大宽度为140px"
 
-#: functions.php:64
+#: functions.php:57
 msgid "404 image URL"
 msgstr "404图片地址"
 
-#: functions.php:65
+#: functions.php:58
 msgid "404 page image URL. max width is 700px"
 msgstr "404图片地址，最大宽度为700px"
 
-#: functions.php:70
+#: functions.php:63
 msgid "header not fixed"
 msgstr "不固定顶部？"
 
-#: functions.php:71
+#: functions.php:64
 msgid "header not fixed?"
 msgstr "顶部(header)不固定？IE6由于不支持固定模式，所以都是不固定的"
 
-#: functions.php:76
+#: functions.php:69
 msgid "show author"
 msgstr "显示文章作者"
 
-#: functions.php:77
+#: functions.php:70
 msgid "display author in article list?"
 msgstr "文章列表页和详细页是否显示当前文章的作者？"
 
-#: functions.php:82
+#: functions.php:75
+msgid "js framework"
+msgstr "JS框架"
+
+#: functions.php:76
+msgid "js framework, jquery or qwrap"
+msgstr "使用的JS框架，目前之前jquery和qwrap"
+
+#: functions.php:81
 msgid "not use ajax"
 msgstr "不使用ajax？"
 
-#: functions.php:83
+#: functions.php:82
 msgid "if not use ajax, cache,storage and animate options is not used"
 msgstr "如果不使用ajax，下面的缓存、本地存储和动画选项将无效"
 
-#: functions.php:88
+#: functions.php:87
 msgid "cache time"
 msgstr "缓存时间"
 
-#: functions.php:89
+#: functions.php:88
 msgid "cache time. default is 1 day. 24 *3600 seconds. 0 is not cache"
 msgstr "缓存时间，默认为1天。单位为秒，0为不缓存"
 
-#: functions.php:94
+#: functions.php:93
 msgid "not use storage?"
 msgstr "不使用本地存储？"
 
-#: functions.php:95
+#: functions.php:94
 msgid "use storage for cache content for next request"
 msgstr "使用本地存储可以在下次访问的时候直接使用缓存"
 
-#: functions.php:100
+#: functions.php:99
 msgid "show fx?"
 msgstr "展现动画"
 
-#: functions.php:101
+#: functions.php:100
 msgid "animate for show content "
 msgstr "内容展现动画"
 
-#: functions.php:106
-#: functions.php:107
-msgid "use manifest"
-msgstr "使用manifest加速"
+#: functions.php:118
+msgid "callback function"
+msgstr "回调函数"
 
-#: functions.php:112
-msgid "manifest value"
-msgstr "manifest内容"
+#: functions.php:119
+msgid "callback function. such as SyntaxHighlighter.highlight()"
+msgstr "使用了ajax后的回调函数，如： 执行语法高亮"
 
-#: functions.php:113
-msgid "just in chrome & firefox"
-msgstr ""
+#: functions.php:125
+msgid "analytic js content"
+msgstr "统计JS代码"
 
-#: functions.php:135
-#: functions.php:136
+#: functions.php:126
+msgid "analytic js content. such as baidu tongji, google analytics"
+msgstr "统计JS代码。比如：使用百度统计、google统计"
+
+#: functions.php:148
+#: functions.php:149
 msgid "Theme Options"
 msgstr "主题设置"
 
-#: functions.php:151
+#: functions.php:164
 #, php-format
 msgid "%1$s Theme Options"
 msgstr "%1$s 主题设置"
 
-#: functions.php:153
+#: functions.php:166
 msgid "Options saved"
 msgstr "设置已保存"
 
-#: functions.php:181
+#: functions.php:199
 msgid "Save Options"
 msgstr "保存设置"
 
@@ -273,7 +284,7 @@ msgstr "&laquo; 上一页"
 msgid "Next page &raquo;"
 msgstr "下一页 &raquo;"
 
-#: header.php:39
+#: header.php:43
 msgid "Home"
 msgstr "首页"
 
@@ -314,6 +325,12 @@ msgstr "分类: %s"
 #: index.php:27
 msgid "Comments: "
 msgstr "评论: "
+
+#~ msgid "use manifest"
+#~ msgstr "使用manifest加速"
+
+#~ msgid "manifest value"
+#~ msgstr "manifest内容"
 
 #~ msgid "Posted by"
 #~ msgstr "作者:"

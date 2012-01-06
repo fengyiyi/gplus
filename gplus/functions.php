@@ -71,6 +71,12 @@ $gplus_items = array (
 		'type' => 'checkbox'
 	),
 	array(
+		'id' => 'js_framework',
+		'name' => __('js framework', 'gplus'),
+		'desc' => __('js framework, jquery or qwrap', 'gplus'),
+		'type' => 'radio'
+	),
+	array(
 		'id' => 'not_use_ajax',
 		'name' => __('not use ajax', 'gplus'),
 		'desc' => __('if not use ajax, cache,storage and animate options is not used', 'gplus'),
@@ -94,7 +100,7 @@ $gplus_items = array (
 		'desc' => __('animate for show content ', 'gplus'),
 		'type' => 'radio'
 	),
-	array(
+	/*array(
 		'id' => 'use_manifest',
 		'name' => __('use manifest', 'gplus'),
 		'desc' => __('use manifest', 'gplus'),
@@ -106,6 +112,20 @@ $gplus_items = array (
 		'desc' => __('just in chrome & firefox', 'gplus'),
 		'type' => 'textarea',
 		'default_value' => "CACHE MANIFEST\n\nCACHE:\nwp-content/themes/gplus/js/jquery.js\n\nNETWORK:\nwp-admin/\n"
+	),*/
+	array(
+		'id' => 'callback_function',
+		'name' => __('callback function', 'gplus'),
+		'desc' => __('callback function. such as SyntaxHighlighter.highlight()', 'gplus'),
+		'type' => 'textarea',
+		'default_value' => "SyntaxHighlighter.highlight()"
+	),
+	array(
+		'id' => 'tongji_js_value',
+		'name' => __('analytic js content', 'gplus'),
+		'desc' => __('analytic js content. such as baidu tongji, google analytics', 'gplus'),
+		'type' => 'textarea',
+		'default_value' => ""
 	),
 );
 add_action( 'admin_init', 'gplus_theme_options_init' );
@@ -154,12 +174,17 @@ function gplus_theme_options_do_page() {
 				<th scope="row"><?php echo $item['name']; ?></th>
 				<td>
 					<?php if ($item['type'] == 'radio'):?>
+					<?php if ($item['id'] == 'js_framework'):?>
+					<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="" <?php if (!$options[$item['id']]):?>checked<?php endif;?>/> jquery
+					&nbsp;&nbsp;<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="qwrap" <?php if ($options[$item['id']] == 'qwrap'):?>checked<?php endif;?>/> qwrap
+					<?php else:?>
 					<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="" <?php if (!$options[$item['id']]):?>checked<?php endif;?>/> none
 					&nbsp;&nbsp;<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="fade" <?php if ($options[$item['id']] == 'fade'):?>checked<?php endif;?>/> fade
+					<?php endif;?>
 					<?php elseif ($item['type'] == 'checkbox'):?>
 					<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="true" <?php if ($options[$item['id']]):?>checked<?php endif;?> size="80" />
 					<?php elseif ($item['type'] == 'textarea'):?>
-					<textarea style="width:500px"  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" rows="8" cols="50"><?php if ($options[$item['id']]){ echo $options[$item['id']];} else {echo $item['default_value'];} ; ?></textarea>
+					<textarea style="width:500px"  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" rows="8" cols="50"><?php if ($options[$item['id']]){ echo gplus_stripvalue($options[$item['id']]);} else {echo gplus_stripvalue($item['default_value']);} ; ?></textarea>
 					
 					<?php else:?>
 					<input style="width:500px" name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" <?php if ( $options[$item['id']] != "") {?>value="<?php echo $options[$item['id']]; ?>"<?php }else{?>value=""<?php } ?> size="80" />
@@ -187,7 +212,7 @@ function gplus_options_validate($input) {
 }
 
 function gplus_is_pjax(){
-	return array_key_exists('HTTP_X_PJAX', $_SERVER) && $_SERVER['HTTP_X_PJAX'] === 'true';
+	return array_key_exists('HTTP_X_PJAX', $_SERVER) && $_SERVER['HTTP_X_PJAX'];
 }
 function gplus_is_get()
 {
@@ -264,5 +289,11 @@ function gplus_get_options(){
 		$options = get_option('gplus_options');
 	}
 	return $options;
+}
+function gplus_stripvalue($value){
+	if (get_magic_quotes_gpc()){
+		return stripslashes($value);
+	}
+	return $value;
 }
 ?>

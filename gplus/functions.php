@@ -12,16 +12,26 @@ function gplus_widgets_init() {
 }
 add_action( 'widgets_init', 'gplus_widgets_init' );
 
+$GLOBALS['comments_li_class'] = 'odd';
+
 function gplus_comment($comment, $args, $depth) {
    $GLOBALS['comment'] = $comment;
 ?>
-<li class="clearfix">
+<li class="clearfix <?php echo $GLOBALS['comments_li_class'];?>">
 	<a class="portrait" name="comment-<?php comment_ID();?>"><?php echo get_avatar($comment,$size='48',$default='' ); ?></a>
 	<span style="display:block;"><?php comment_author_link() ?>&nbsp;&nbsp;<?php printf(__('%1$s at %2$s', 'gplus'), get_comment_date(),  get_comment_time()) ?></a><?php edit_comment_link(__('[Edit]'),' ','') ?></span>
 	<?php if ($comment->comment_approved == '0') : ?>
 	<em class="approved"><?php _e('Your comment is awaiting moderation.', 'gplus') ?></em>
 	<?php endif; ?>
 	<?php comment_text() ?>
+	
+	<?php 
+		if ($GLOBALS['comments_li_class'] === 'odd'){
+			$GLOBALS['comments_li_class'] = 'even';
+		}else{
+			$GLOBALS['comments_li_class'] = 'odd';
+		}
+	?>
 </li>
 <?php }
 
@@ -231,6 +241,9 @@ function gplus_is_ie(){
 function gplus_is_ie6(){
 	return !!(strpos($_SERVER["HTTP_USER_AGENT"], "MSIE 6") !== false);
 }
+function gplus_version(){
+	return '1.1';
+}
 /**
  * 
  * 获取最新文章的最后修改时间
@@ -296,4 +309,3 @@ function gplus_stripvalue($value){
 	}
 	return $value;
 }
-?>

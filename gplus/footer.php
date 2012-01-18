@@ -7,13 +7,15 @@
 <?php $options = gplus_get_options();?>
 <?php if (!gplus_is_ie() && !($options['not_use_ajax'])):?>
 <div class="loading"><span>loading...</span></div>
-<script>var pjaxHomeUrl = "<?php echo home_url();?>", pjaxTitleSuffix="<?php bloginfo('name'); ?>", pjaxUseStorage=<?php if ($options['not_use_storage']):?>false<?php else :?>true<?php endif;?>, pjaxCacheTime=<?php if (strlen($options['cache_time'])):echo intval($options['cache_time'])?><?php else :?>true<?php endif;?>, pjaxFx="<?php echo $options['show_fx']?>",pjaxCallback=function(){try{<?php echo ($options['callback_function'] ? $options['callback_function'] : 'SyntaxHighlighter.highlight()');?>}catch(e){}}</script>
+<script>var pjaxHomeUrl = "<?php echo home_url();?>", pjaxTitleSuffix=" | <?php bloginfo('name'); ?>", pjaxUseStorage=<?php if ($options['not_use_storage']):?>false<?php else :?>true<?php endif;?>, pjaxCacheTime=<?php if (strlen($options['cache_time'])):echo intval($options['cache_time'])?><?php else :?>true<?php endif;?>, pjaxFx="<?php echo $options['show_fx']?>",pjaxCallback=function(){try{<?php echo ($options['callback_function'] ? $options['callback_function'] : 'SyntaxHighlighter.highlight()');?>}catch(e){}}</script>
 <?php if ($options['js_framework'] == 'qwrap'):?>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap.js"></script>
-<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap_plus.js"></script>
+<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap.pjax.js?v=<?php echo gplus_version();?>"></script>
+<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap.gplus.js?v=<?php echo gplus_version();?>"></script>
 <?php else :?>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.js"></script>
-<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery_plus.js"></script>
+<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.pjax.js?v=<?php echo gplus_version();?>"></script>
+<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.gplus.js?v=<?php echo gplus_version();?>"></script>
 <?php endif;?>
 <?php endif;?>
 <?php if ($options['tongji_js_value']):?>

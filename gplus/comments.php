@@ -37,6 +37,12 @@ if ( post_password_required() ) { ?>
 	//$comment_notes='<p class="comment-note">' . __('NOTE - You can use these ') . sprintf(('<abbr title="HyperText Markup Language">HTML</abbr> tags and attributes:<br />%s' ), ' <code>' . allowed_tags() . '</code>' ) . '</p>';
 	//if($options['comment_notes']=='true') $comment_notes='';
 	//if($options['smilies']=='true') $smilies=''; else $smilies='<p class="smilies">'.$smilies.'</p>';
+	$smilies = '';
+	ob_start();
+	if ( function_exists(cs_print_smilies) ) {cs_print_smilies();}
+	$smilies = ob_get_contents();
+	ob_end_clean();
+	
 	$fields =  array(
 			'author' => '<p class="comment-item">' .
 			'<input class="author" name="author" type="text" value="' . esc_attr( $commenter['comment_author'] ) . '" size="30" />'. ' <label for="author">' . __( 'NAME', 'gplus' ) . '</label></p>',
@@ -48,7 +54,7 @@ if ( post_password_required() ) { ?>
 	$args = array(
 			'fields'               => apply_filters( 'comment_form_default_fields', $fields ),
 			'comment_notes_before' => '',
-			'comment_field'        => $smilies.'<p class="comment-form-comment"><textarea aria-required="true" rows="8" cols="45" name="comment" id="comment" onkeydown="if(event.ctrlKey){if(event.keyCode==13){document.getElementById(\'submit\').click();return false}};"></textarea></p>',
+			'comment_field'        => $smilies.'<p class="comment-form-comment"><textarea aria-required="true" rows="8" style="width:400px" cols="90" name="comment" id="comment" onkeydown="if(event.ctrlKey){if(event.keyCode==13){document.getElementById(\'submit\').click();return false}};"></textarea></p>',
 			'comment_notes_after'  => $comment_notes,
 			'title_reply'          => __( 'Leave a Comment', 'gplus'),
 			'title_reply_to'       => __('Reply to %s &not;<br />', 'gplus'), 

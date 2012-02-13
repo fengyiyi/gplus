@@ -12,7 +12,11 @@
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap.js"></script>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap.pjax.js?v=<?php echo gplus_version();?>"></script>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/qwrap.gplus.js?v=<?php echo gplus_version();?>"></script>
-<?php else :?>
+<?php elseif($options['js_framework'] == 'kissy') :?>
+<script src="http://a.tbcdn.cn/s/kissy/1.2.0/kissy.js"></script>
+<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/kissy.pjax.js?v=<?php echo gplus_version();?>"></script>
+<script src="<?php echo get_stylesheet_directory_uri(true);?>/js/kissy.gplus.js?v=<?php echo gplus_version();?>"></script>
+<?php else:?>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.js"></script>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.pjax.js?v=<?php echo gplus_version();?>"></script>
 <script src="<?php echo get_stylesheet_directory_uri(true);?>/js/jquery.gplus.js?v=<?php echo gplus_version();?>"></script>

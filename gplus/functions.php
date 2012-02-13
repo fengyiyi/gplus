@@ -83,7 +83,7 @@ $gplus_items = array (
 	array(
 		'id' => 'js_framework',
 		'name' => __('js framework', 'gplus'),
-		'desc' => __('js framework, jquery or qwrap', 'gplus'),
+		'desc' => __('js framework, jquery or qwrap or kissy', 'gplus'),
 		'type' => 'radio'
 	),
 	array(
@@ -187,6 +187,8 @@ function gplus_theme_options_do_page() {
 					<?php if ($item['id'] == 'js_framework'):?>
 					<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="" <?php if (!$options[$item['id']]):?>checked<?php endif;?>/> jquery
 					&nbsp;&nbsp;<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="qwrap" <?php if ($options[$item['id']] == 'qwrap'):?>checked<?php endif;?>/> qwrap
+					&nbsp;&nbsp;<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="kissy" <?php if ($options[$item['id']] == 'kissy'):?>checked<?php endif;?>/> kissy
+		
 					<?php else:?>
 					<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="" <?php if (!$options[$item['id']]):?>checked<?php endif;?>/> none
 					&nbsp;&nbsp;<input  name="<?php echo 'gplus_options['.$item['id'].']'; ?>" type="<?php echo $item['type']?>" value="fade" <?php if ($options[$item['id']] == 'fade'):?>checked<?php endif;?>/> fade
@@ -242,7 +244,7 @@ function gplus_is_ie6(){
 	return !!(strpos($_SERVER["HTTP_USER_AGENT"], "MSIE 6") !== false);
 }
 function gplus_version(){
-	return '1.1';
+	return '1.2';
 }
 /**
  * 

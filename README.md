@@ -2,6 +2,9 @@
 
 这是我做的第一个wordpress皮肤，肯定有很多问题，希望大家能够体谅和积极反馈，我会及时修改的。
 
+
+<span style="color:red">下载安装请下载tags目录下最新版本，这里版本通过编译平台进行了很多优化(如：HTML/JS/CSS进行了压缩)</span>
+
 ## 预览图
 ![screenshot.png](http://www.welefen.com/wp-content/uploads/2011/07/screenshot.png "google plus for wordpress theme")
 ## 功能列表

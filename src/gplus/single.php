@@ -24,6 +24,7 @@
 			<div class="md"><?php the_time('m-d'); ?></div>
 			<div class="y"><?php the_time('Y'); ?></div>
 		</div>
+		<div>-- EOF -- 看完了，<a href="#commentForm">留个脚印~~</a> ^_^</div>
 	</article>
 	<?php comments_template( '', true ); ?>
 	

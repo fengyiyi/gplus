@@ -1,9 +1,165 @@
+/*
+ * @fileoverview  提供事件代理功能
+ *
+ * @author tconzi@gmail.com
+ *
+ * @version 1.0
+ */
+;(function(){
+var delegateCache = {}, bindEventCache = {},
+
+//quick匹配方案大多数参考自jquery1.7,thanks
+rquickIs = /^(\w*)(?:#([\w\-]+))?(\.[\w\-]+)*$/,
+//处理selector
+quickParse = function(selector) {
+    var quick = rquickIs.exec(selector);
+    if(quick) {
+        //   0  1    2   3
+        // [ _, tag, id, class ],为支持多个class ,class为.a.b.c
+        quick[1] = (quick[1] || "" ).toLowerCase();
+        //quick[3] = quick[3] && new RegExp( "(?:^|\\s)" + quick[3] + "(?:\\s|$)" );
+
+    }
+    return quick;
+},
+//比较dom节点，与selector节点是否匹配
+quickIs = function(elem, m) {
+
+    //测试className是否匹配上，为支持.a.b.c这种情况，做了一些特殊处理
+    var classTest;
+    if( classTest = m[3]) {//m[3] !== ""
+        var cname = elem.className;
+        var ct = m[3].slice(1).split(".");
+        baidu.array.each(ct, function(item) {
+            if(item) {
+                var rClass = new RegExp("(?:^|\\s)" + item + "(?:\\s|$)");
+                classTest = classTest && rClass.test(cname);
+            }
+        });
+    } else {
+        //!m[3]
+        classTest = 1;
+    }
+
+    return ((!m[1] || elem.nodeName.toLowerCase() === m[1]) && (!m[2] || elem.id === m[2]) && classTest
+    );
+};
+function match(selector, domarray) {
+
+    //匹配selector 与冒泡上来的dom路径的相关度，从最后一级往上走
+    //selector 切分：空格为界，[["#id","class","tag"],...]
+
+    var arrs = selector.split(" ").reverse();
+
+    var i = 0, l = arrs.length;
+
+    for(var j = 0, len = domarray.length; j < len; j++) {
+        var m = quickParse(arrs[i]);
+        if(quickIs(domarray[j], m)) {
+            if(++i == l) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+
+}
+
+//提供一个回调方法
+function on(type) {
+    var type = type;
+    return function(e) {
+        var evt = baidu.event.get(e);
+        var ele = evt.target;
+        var dompathCache = [];
+        // [["id","classname","tagname"],[...],...],位置，eventTarget 到document
+        while(ele) {
+            if(ele.nodeType == 1) {//只关注元素节点,文本节点看上一级
+                dompathCache.push(ele);
+            }
+            ele = ele.parentNode;
+        }
+
+        var selectors = delegateCache[type];
+        baidu.object.each(selectors, function(item, key) {
+            if(match(key, dompathCache)) {
+                baidu.object.each(item, function(handle, id) {
+                    if( typeof handle == "function") {
+                        handle.call(e, e);
+                        //console.log(id);
+                    }
+                });
+            }
+        });
+        ele = null;
+        dompathCache = null;
+    }
+}
+
+//给document绑定一个对象，内部方法　
+function bindEvent(type) {
+    if(!bindEventCache[type]) {
+        bindEventCache[type] = on(type);
+        baidu.on(document, type, bindEventCache[type]);
+    }
+}
+
+var _guid = 1;
+function getId() {
+    return "_fis_delegate_id__" + (++_guid);
+}
+
+/**
+ *
+ * 绑定代理事件
+ * @type function
+ * @param {String} selector ，css selector写法，仅支持" #id .class tag "
+ * @param {String} type ，事件类型，可为默认的事件模型中的类型，鼠标事件暂只支持"mousedown","mouseup","click","dblclick"
+ * @param {function} handle ,事件处理函数，会回传一个event对象过来
+ * @param {String} 【id】 事件的id，用于销毁
+ */
+
+baidu.dom.delegate = function(selector, type, handle, id) {
+    //delegateCache[type][selector]
+
+    type = type.replace(/^on/, "");
+    selector = baidu.string.trim(selector.replace(/[ ]+/g, " "));
+    //将多个空格去掉
+
+    delegateCache[type] = delegateCache[type] || {};
+    delegateCache[type][selector] = delegateCache[type][selector] || {};
+    id = id || getId();
+    handle.fisDelegateId = id;
+    delegateCache[type][selector][id] = handle;
+
+    //给document对象绑定事件
+    bindEvent(type);
+
+    return id;
+
+}
+})();
+
+
+
 /*!
- * pjax(ajax + history.pushState) for jquery
+ * pjax(ajax + history.pushState) for tangram
  * 
  * by welefen
+ * @version 1.0
+ * @license MIT
+ * @copyright 2011-2012
  */
-(function($) {
+(function() {
+	var mix = function(){
+		var target = arguments[0] ,i = 1, len = arguments.length;
+		for(;i<len;i++){
+			target = baidu.object.extend(target, arguments[i]);
+		}
+		return target;
+	}
+	
 	var Util = {
 		support : {
 			pjax : window.history && window.history.pushState && window.history.replaceState && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/),
@@ -106,7 +262,7 @@
 	};
 	// pjax
 	var pjax = function(options) {
-		options = $.extend({
+		options = mix({}, {
 			selector : '',
 			container : '',
 			callback : function() {},
@@ -115,11 +271,12 @@
 		if (!options.container || !options.selector) {
 			throw new Error('selector & container options must be set');
 		}
-		$('body').delegate(options.selector, 'click', function(event) {
+		baidu.dom.delegate(options.selector, 'click', function(event) {
+			event = baidu.event.getEvent(event);
 			if (event.which > 1 || event.metaKey) {
 				return true;
 			}
-			var $this = $(this), href = $this.attr('href');
+			var $this = event.target || event.srcElement, href = baidu.dom.getAttr($this, 'href');
 			// 过滤
 			if (typeof options.filter === 'function') {
 				if (options.filter.call(this, href, this) === true){
@@ -140,8 +297,8 @@
 				}
 				return true;
 			}
-			event.preventDefault();
-			options = $.extend(true, options, {
+			baidu.event.preventDefault(event);
+			options = mix({}, options, {
 				url : href,
 				element : this
 			});
@@ -170,19 +327,14 @@
 		},
 		dataType : 'html',
 		callback : null, // 回调函数
-		// for jquery
-		beforeSend : function(xhr) {
-			$(pjax.options.container).trigger('pjax.start', [ xhr, pjax.options ]);
-			xhr && xhr.setRequestHeader('X-PJAX', true);
+		headers:{
+			'X-PJAX': true
 		},
-		error : function() {
+		onfailure : function() {
 			pjax.options.callback && pjax.options.callback.call(pjax.options.element, {
 				type : 'error'
 			});
 			location.href = pjax.options.url;
-		},
-		complete : function(xhr) {
-			$(pjax.options.container).trigger('pjax.end', [ xhr, pjax.options ]);
 		}
 	};
 	// 展现动画
@@ -190,19 +342,6 @@
 		"_default" : function(data, callback, isCached) {
 			this.html(data);
 			callback && callback.call(this, data, isCached);
-		},
-		fade: function(data, callback, isCached){
-			var $this = this;
-			if(isCached){
-				$this.html(data);
-				callback && callback.call($this, data, isCached);
-			}else{
-				this.fadeOut(500, function(){
-					$this.html(data).fadeIn(500, function(){
-						callback && callback.call($this, data, isCached);
-					});
-				});
-			}
 		}
 	}
 	// 展现函数
@@ -233,10 +372,13 @@
 		}, isCached);
 	}
 	// success callback
-	pjax.success = function(data, isCached) {
+	pjax.onsuccess = function(xhr, data, isCached) {
 		// isCached default is success
 		if (isCached !== true) {
 			isCached = false;
+		}
+		if(typeof data ==='object'){
+			data = this.requester.responseText;
 		}
 		if ((data || '').indexOf('<html') != -1) {
 			pjax.options.callback && pjax.options.callback.call(pjax.options.element, {
@@ -252,8 +394,8 @@
 				title = matches[1];
 			}
 			if (!title && pjax.options.element) {
-				el = $(pjax.options.element);
-				title = el.attr('title') || el.text();
+				el = baidu.dom.query(pjax.options.element)[0];
+				title = baidu.dom.getAttr(el, 'title') || el.innerHTML;
 			}
 		}
 		if (title) {
@@ -271,13 +413,13 @@
 			title : title,
 			url : pjax.options.oldUrl
 		};
-		var query = $.param(pjax.options.data);
+		var query = baidu.url.jsonToQuery(pjax.options.data);
 		if (query != "") {
 			pjax.state.url = pjax.options.url + (/\?/.test(pjax.options.url) ? "&" : "?") + query;
 		}
 		if (pjax.options.push) {
 			if (!pjax.active) {
-				history.replaceState($.extend({}, pjax.state, {
+				history.replaceState(mix({}, pjax.state, {
 					url : null
 				}), document.title);
 				pjax.active = true;
@@ -292,19 +434,20 @@
 			});
 		}, isCached);
 		// 设置cache
-		if (pjax.options.cache && !isCached) {
+		if (pjax.options.cache && ! isCached) {
 			Util.setCache(pjax.options.url, data, title, pjax.options.storage);
 		}
 	};
 	
 	// 发送请求
 	pjax.request = function(options) {
-		options = $.extend(true, pjax.defaultOptions, options);
-		var cache, container = $(options.container);
+		options = mix({}, pjax.defaultOptions, options);
+		var cache, container = baidu.dom.query(options.container)[0];
 		options.oldUrl = options.url;
 		options.url = Util.getRealUrl(options.url);
-		if($(options.element).length){
-			cache = Util.toInt($(options.element).attr('data-pjax-cache'));
+		var el = baidu.dom.query(options.element)[0];
+		if(el){
+			cache = Util.toInt(baidu.dom.getAttr(el, 'data-pjax-cache'));
 			if (cache) {
 				options.cache = cache;
 			}
@@ -324,30 +467,32 @@
 			};
 		}
 		pjax.options = options;
-		pjax.options.success = pjax.success;
+		pjax.options.onsuccess = pjax.onsuccess;
 		if (options.cache && (cache = Util.getCache(options.url, options.cache, options.storage))) {
-			options.beforeSend();
+			baidu.event.fire(container, 'pjax.start');
 			options.title = cache.title;
-			pjax.success(cache.data, true);
-			options.complete();
+			pjax.onsuccess(null, cache.data, true);
+			baidu.event.fire(container, 'pjax.end');
 			return true;
 		}
-		if (pjax.xhr && pjax.xhr.readyState < 4) {
-			pjax.xhr.onreadystatechange = $.noop;
-			pjax.xhr.abort();
+		if (pjax.xhr && pjax.xhr.cancel) {
+			pjax.xhr.cancel();
 		}
-		pjax.xhr = $.ajax(pjax.options);
+		pjax.xhr = baidu.ajax.request(pjax.options.url, pjax.options);
+		baidu.event.fire(container, 'pjax.start');
+		pjax.xhr.send(pjax.options.url, 'get', pjax.options.data);
+		baidu.event.fire(container, 'pjax.end');
 	};
 
 	// popstate event
 	var popped = ('state' in window.history), initialURL = location.href;
-	$(window).bind('popstate', function(event) {
+	baidu.event.on(window, 'popstate', function(event) {
 		var initialPop = !popped && location.href == initialURL;
 		popped = true;
 		if (initialPop) return;
 		var state = event.state;
 		if (state && state.container) {
-			if ($(state.container).length) {
+			if (W(state.container).length) {
 				var data = {
 					url : state.url || location.href,
 					container : state.container,
@@ -374,13 +519,7 @@
 			}
 		};
 	}
-	// pjax bind to $
-	$.pjax = pjax;
-	$.pjax.util = Util;
+	pjax.util = Util;
+	baidu.pjax = pjax;
 
-	// extra
-	if ($.inArray('state', $.event.props) < 0) {
-		$.event.props.push('state')
-	}
-
-})(jQuery);
+})();

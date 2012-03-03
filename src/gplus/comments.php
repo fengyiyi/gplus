@@ -61,7 +61,7 @@ if ( post_password_required() ) { ?>
 			'cancel_reply_link'    => __( '<small>Cancel reply</small>', 'gplus' ),
 			'label_submit'         => __( 'SUBMIT', 'gplus' )
 			);
-
+	echo "<a name='commentForm'></a>";
 	comment_form($args); 
 
 	$havepings = 0;
